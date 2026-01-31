@@ -1,0 +1,1597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#1e1e1e">
+    <title>Salt Analysis Laboratory</title>
+    <style>
+        :root {
+            --qt-window: #1e1e1e;
+            --qt-base: #252525;
+            --qt-alternate: #2d2d2d;
+            --qt-button: #3d3d3d;
+            --qt-button-hover: #4a4a4a;
+            --qt-button-pressed: #2a2a2a;
+            --qt-highlight: #0078d4;
+            --qt-highlight-dim: #005a9e;
+            --qt-text: #e0e0e0;
+            --qt-text-dim: #808080;
+            --qt-border: #4a4a4a;
+            --qt-border-dark: #3a3a3a;
+            --qt-success: #4caf50;
+            --qt-error: #f44336;
+            --qt-warning: #ff9800;
+            --qt-group-border: #505050;
+            --qt-scrollbar: #555;
+            --qt-scrollbar-hover: #666;
+            
+            --safe-top: env(safe-area-inset-top);
+            --safe-bottom: env(safe-area-inset-bottom);
+            --safe-left: env(safe-area-inset-left);
+            --safe-right: env(safe-area-inset-right);
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            margin: 0;
+            padding: 0;
+        }
+
+        html, body {
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Ubuntu', sans-serif;
+            font-size: 14px;
+            background-color: var(--qt-window);
+            color: var(--qt-text);
+            display: flex;
+            flex-direction: column;
+            touch-action: manipulation;
+        }
+
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--qt-base);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--qt-scrollbar);
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--qt-scrollbar-hover);
+        }
+
+        /* === HEADER === */
+        .app-header {
+            background: linear-gradient(180deg, #2a2a2a 0%, var(--qt-base) 100%);
+            border-bottom: 1px solid var(--qt-border-dark);
+            padding: 10px 12px;
+            padding-top: calc(10px + var(--safe-top));
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+            z-index: 100;
+        }
+
+        .app-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--qt-text);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .app-title-icon {
+            font-size: 18px;
+        }
+
+        .salt-badge {
+            background: var(--qt-highlight);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        /* === MAIN CONTAINER === */
+        .main-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            min-height: 0;
+        }
+
+        /* === LAB VIEW === */
+        .lab-view {
+            height: 35vh;
+            min-height: 200px;
+            max-height: 300px;
+            background: linear-gradient(145deg, #1a1a2e 0%, #0d0d15 100%);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            border-bottom: 1px solid var(--qt-border-dark);
+            flex-shrink: 0;
+        }
+
+        /* Ion Checklist */
+        .checklist-container {
+            background: rgba(0,0,0,0.3);
+            padding: 6px 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .checklist-label {
+            font-size: 9px;
+            text-transform: uppercase;
+            color: var(--qt-text-dim);
+            margin-bottom: 4px;
+            letter-spacing: 0.5px;
+        }
+
+        .checklist {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+        }
+
+        .check-item {
+            font-size: 9px;
+            font-weight: 600;
+            color: var(--qt-text-dim);
+            background: var(--qt-alternate);
+            padding: 2px 6px;
+            border-radius: 3px;
+            border: 1px solid var(--qt-border-dark);
+            transition: all 0.2s;
+        }
+
+        .check-item.done {
+            color: var(--qt-success);
+            background: rgba(76, 175, 80, 0.2);
+            border-color: var(--qt-success);
+        }
+
+        /* Visual Container */
+        .visual-container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 10px;
+            min-height: 0;
+        }
+
+        .svg-wrapper {
+            width: 100%;
+            height: 100%;
+            max-width: 200px;
+            max-height: 250px;
+        }
+
+        svg {
+            width: 100%;
+            height: 100%;
+            overflow: visible;
+        }
+
+        /* SVG Animations */
+        .liquid {
+            transition: fill 0.6s ease, opacity 0.5s ease, y 0.3s ease;
+        }
+
+        .precipitate {
+            transition: fill 0.4s ease, opacity 0.5s ease;
+        }
+
+        .flame-outer {
+            animation: flame-flicker 0.15s infinite alternate;
+            transform-origin: center bottom;
+        }
+
+        .flame-inner {
+            animation: flame-flicker 0.1s infinite alternate-reverse;
+            transform-origin: center bottom;
+        }
+
+        @keyframes flame-flicker {
+            0% { transform: scale(1, 1) skewX(0deg); opacity: 0.9; }
+            100% { transform: scale(1.03, 1.05) skewX(2deg); opacity: 1; }
+        }
+
+        .bubble {
+            animation: bubble-rise 2s ease-in infinite;
+        }
+
+        @keyframes bubble-rise {
+            0% { transform: translateY(0) scale(1); opacity: 0.8; }
+            50% { transform: translateY(-40px) scale(1.1); opacity: 0.6; }
+            100% { transform: translateY(-80px) scale(0.8); opacity: 0; }
+        }
+
+        .fume {
+            animation: fume-rise 3s ease-out infinite;
+        }
+
+        @keyframes fume-rise {
+            0% { transform: translateY(0); opacity: 0.7; }
+            100% { transform: translateY(-50px); opacity: 0; }
+        }
+
+        /* === CONTROLS PANEL === */
+        .controls-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            min-height: 0;
+            background: var(--qt-window);
+        }
+
+        /* Log Console */
+        .log-container {
+            background: var(--qt-base);
+            border-bottom: 1px solid var(--qt-border-dark);
+            padding: 8px 10px;
+            flex-shrink: 0;
+        }
+
+        .log-header {
+            font-size: 10px;
+            text-transform: uppercase;
+            color: var(--qt-text-dim);
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .log-header::before {
+            content: '▶';
+            font-size: 7px;
+            color: var(--qt-success);
+        }
+
+        .log-box {
+            background: #0a0a0a;
+            border: 1px solid var(--qt-border-dark);
+            font-family: 'SF Mono', 'Menlo', 'Consolas', monospace;
+            font-size: 10px;
+            color: #98c379;
+            height: 60px;
+            overflow-y: auto;
+            padding: 6px 8px;
+            border-radius: 4px;
+        }
+
+        .log-entry {
+            margin-bottom: 2px;
+            padding-bottom: 2px;
+            border-bottom: 1px solid #1a1a1a;
+            line-height: 1.3;
+        }
+
+        .log-entry:last-child {
+            border-bottom: none;
+        }
+
+        /* Scrollable Content */
+        .controls-content {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 10px;
+            padding-bottom: calc(10px + var(--safe-bottom));
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* Qt-style Group Box */
+        .qt-groupbox {
+            background: var(--qt-base);
+            border: 1px solid var(--qt-group-border);
+            border-radius: 6px;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .qt-groupbox-title {
+            background: linear-gradient(180deg, #3a3a3a 0%, #2d2d2d 100%);
+            padding: 8px 10px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            color: var(--qt-text);
+            border-bottom: 1px solid var(--qt-border-dark);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .qt-groupbox-title span {
+            font-size: 12px;
+        }
+
+        .qt-groupbox-content {
+            padding: 8px;
+        }
+
+        /* Collapsible Groups */
+        .qt-groupbox.collapsed .qt-groupbox-content {
+            display: none;
+        }
+
+        .qt-groupbox-title::after {
+            content: '▼';
+            font-size: 8px;
+            margin-left: auto;
+            color: var(--qt-text-dim);
+            transition: transform 0.2s;
+        }
+
+        .qt-groupbox.collapsed .qt-groupbox-title::after {
+            transform: rotate(-90deg);
+        }
+
+        /* Qt-style Buttons */
+        .qt-btn-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 6px;
+        }
+
+        .qt-btn-grid-4 {
+            grid-template-columns: repeat(4, 1fr);
+        }
+
+        .qt-btn {
+            background: linear-gradient(180deg, var(--qt-button) 0%, #353535 100%);
+            border: 1px solid var(--qt-border);
+            border-bottom: 2px solid var(--qt-border-dark);
+            color: var(--qt-text);
+            padding: 10px 4px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.1s;
+            text-align: center;
+            min-height: 44px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 2px;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        .qt-btn:active {
+            background: var(--qt-button-pressed);
+            border-bottom-width: 1px;
+            transform: translateY(1px);
+        }
+
+        .qt-btn-icon {
+            font-size: 14px;
+        }
+
+        /* Button variants */
+        .qt-btn-acid { border-left: 3px solid #e91e63; }
+        .qt-btn-group { border-left: 3px solid #2196f3; }
+        .qt-btn-conf { border-left: 3px solid #ff9800; }
+
+        .qt-btn-action {
+            background: linear-gradient(180deg, #4a4a4a 0%, #3a3a3a 100%);
+            border-left: 3px solid var(--qt-highlight);
+        }
+
+        .qt-btn-danger {
+            background: linear-gradient(180deg, #5a3030 0%, #4a2525 100%);
+            border-color: #6a3535;
+            border-left: 3px solid var(--qt-error);
+        }
+
+        /* Deduction Panel */
+        .deduction-panel {
+            background: var(--qt-base);
+            border: 2px solid var(--qt-highlight);
+            border-radius: 6px;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .deduction-title {
+            background: linear-gradient(180deg, var(--qt-highlight) 0%, var(--qt-highlight-dim) 100%);
+            padding: 10px 12px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .deduction-content {
+            padding: 10px;
+        }
+
+        .guess-row {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        /* Qt-style Select */
+        .qt-select {
+            flex: 1;
+            background: var(--qt-alternate);
+            border: 1px solid var(--qt-border);
+            border-radius: 4px;
+            color: var(--qt-text);
+            padding: 12px 10px;
+            font-size: 13px;
+            font-family: inherit;
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23808080' d='M2 4l4 4 4-4z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            min-height: 44px;
+        }
+
+        .qt-select:focus {
+            outline: none;
+            border-color: var(--qt-highlight);
+        }
+
+        .qt-select option {
+            background: var(--qt-base);
+            color: var(--qt-text);
+        }
+
+        /* Submit Button */
+        .qt-btn-submit {
+            width: 100%;
+            background: linear-gradient(180deg, var(--qt-success) 0%, #3d8b40 100%);
+            border: 1px solid #4caf50;
+            border-bottom: 3px solid #2e7d32;
+            color: white;
+            padding: 14px;
+            font-size: 14px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            min-height: 50px;
+        }
+
+        .qt-btn-submit:active {
+            background: #3d8b40;
+        }
+
+        /* Win Screen */
+        #win-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 1000;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 20px;
+        }
+
+        #win-screen h1 {
+            color: var(--qt-success);
+            font-size: 36px;
+            margin-bottom: 10px;
+        }
+
+        #win-screen p {
+            color: var(--qt-text-dim);
+            font-size: 14px;
+            margin-bottom: 30px;
+        }
+
+        #win-screen .qt-btn {
+            padding: 16px 40px;
+            font-size: 14px;
+            min-height: auto;
+            flex-direction: row;
+            gap: 8px;
+        }
+
+        /* === TABLET & LANDSCAPE === */
+        @media (min-width: 600px) {
+            .main-container {
+                flex-direction: row;
+            }
+
+            .lab-view {
+                width: 40%;
+                height: 100%;
+                max-height: none;
+                min-height: unset;
+                border-bottom: none;
+                border-right: 1px solid var(--qt-border-dark);
+            }
+
+            .controls-panel {
+                width: 60%;
+            }
+
+            .qt-btn-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+
+            .qt-btn {
+                font-size: 11px;
+                padding: 12px 6px;
+            }
+
+            .log-box {
+                height: 80px;
+            }
+
+            .svg-wrapper {
+                max-width: 250px;
+                max-height: 320px;
+            }
+        }
+
+        /* === LARGE SCREENS === */
+        @media (min-width: 900px) {
+            body {
+                font-size: 14px;
+            }
+
+            .app-header {
+                padding: 12px 20px;
+            }
+
+            .app-title {
+                font-size: 16px;
+            }
+
+            .lab-view {
+                width: 42%;
+            }
+
+            .controls-panel {
+                width: 58%;
+            }
+
+            .controls-content {
+                padding: 15px;
+                gap: 12px;
+            }
+
+            .qt-btn-grid {
+                grid-template-columns: repeat(5, 1fr);
+            }
+
+            .qt-btn {
+                font-size: 12px;
+                min-height: 48px;
+            }
+
+            .log-box {
+                height: 100px;
+                font-size: 11px;
+            }
+
+            .svg-wrapper {
+                max-width: 280px;
+                max-height: 380px;
+            }
+        }
+
+        /* === SMALL PHONES === */
+        @media (max-width: 360px) {
+            .app-title span:not(.app-title-icon) {
+                display: none;
+            }
+
+            .qt-btn-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 4px;
+            }
+
+            .qt-btn {
+                font-size: 9px;
+                padding: 8px 2px;
+                min-height: 40px;
+            }
+
+            .qt-btn-icon {
+                font-size: 12px;
+            }
+
+            .check-item {
+                font-size: 8px;
+                padding: 2px 4px;
+            }
+
+            .lab-view {
+                height: 30vh;
+                min-height: 180px;
+            }
+        }
+
+        /* === LANDSCAPE PHONE === */
+        @media (max-height: 500px) and (orientation: landscape) {
+            .main-container {
+                flex-direction: row;
+            }
+
+            .lab-view {
+                width: 35%;
+                height: 100%;
+                max-height: none;
+                min-height: unset;
+                border-bottom: none;
+                border-right: 1px solid var(--qt-border-dark);
+            }
+
+            .controls-panel {
+                width: 65%;
+            }
+
+            .checklist-container {
+                display: none;
+            }
+
+            .log-container {
+                display: none;
+            }
+
+            .qt-groupbox-content {
+                padding: 6px;
+            }
+
+            .qt-btn {
+                min-height: 36px;
+                padding: 6px 4px;
+            }
+
+            .controls-content {
+                padding: 8px;
+                gap: 8px;
+            }
+        }
+
+        /* Tab Navigation for Mobile */
+        .tab-nav {
+            display: none;
+            background: var(--qt-base);
+            border-bottom: 1px solid var(--qt-border-dark);
+            flex-shrink: 0;
+        }
+
+        .tab-nav-inner {
+            display: flex;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .tab-btn {
+            flex: 1;
+            min-width: 80px;
+            padding: 10px 8px;
+            background: transparent;
+            border: none;
+            border-bottom: 2px solid transparent;
+            color: var(--qt-text-dim);
+            font-size: 10px;
+            font-family: inherit;
+            font-weight: 500;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+        }
+
+        .tab-btn.active {
+            color: var(--qt-highlight);
+            border-bottom-color: var(--qt-highlight);
+            background: rgba(0, 120, 212, 0.1);
+        }
+
+        .tab-btn span {
+            font-size: 16px;
+        }
+
+        @media (max-width: 599px) {
+            .tab-nav {
+                display: block;
+            }
+
+            .qt-groupbox {
+                display: none;
+            }
+
+            .qt-groupbox.active {
+                display: block;
+            }
+
+            .deduction-panel {
+                display: block;
+            }
+        }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: rgba(0,0,0,0.9);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 13px;
+            z-index: 1000;
+            opacity: 0;
+            transition: all 0.3s ease;
+            pointer-events: none;
+            max-width: 90%;
+            text-align: center;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        .toast.success {
+            background: rgba(76, 175, 80, 0.95);
+        }
+
+        .toast.error {
+            background: rgba(244, 67, 54, 0.95);
+        }
+    </style>
+</head>
+<body>
+    <!-- SVG Filters -->
+    <svg style="position: absolute; width: 0; height: 0;">
+        <defs>
+            <filter id="curdy">
+                <feTurbulence type="turbulence" baseFrequency="0.06" numOctaves="3" result="noise"/>
+                <feDisplacementMap in="SourceGraphic" in2="noise" scale="8"/>
+            </filter>
+            <filter id="gelatinous">
+                <feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="2" result="noise"/>
+                <feGaussianBlur in="noise" stdDeviation="2" result="blur"/>
+                <feDisplacementMap in="SourceGraphic" in2="blur" scale="12"/>
+            </filter>
+            <filter id="crystalline">
+                <feTurbulence type="fractalNoise" baseFrequency="0.5" numOctaves="2" result="noise"/>
+                <feDisplacementMap in="SourceGraphic" in2="noise" scale="3"/>
+            </filter>
+            <filter id="glow">
+                <feGaussianBlur stdDeviation="3" result="blur"/>
+                <feMerge>
+                    <feMergeNode in="blur"/>
+                    <feMergeNode in="SourceGraphic"/>
+                </feMerge>
+            </filter>
+        </defs>
+    </svg>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast"></div>
+
+    <!-- Win Screen -->
+    <div id="win-screen">
+        <h1>🎉 Complete!</h1>
+        <p>All ions have been identified successfully.</p>
+        <button class="qt-btn" onclick="game.initGame()">
+            <span class="qt-btn-icon">🔬</span>
+            New Analysis
+        </button>
+    </div>
+
+    <!-- Header -->
+    <header class="app-header">
+        <div class="app-title">
+            <span class="app-title-icon">🧪</span>
+            <span>Salt Analysis Lab</span>
+        </div>
+        <div class="salt-badge" id="lap-display">Salt 1/8</div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Lab View -->
+        <div class="lab-view">
+            <div class="checklist-container">
+                <div class="checklist-label">Progress</div>
+                <div class="checklist" id="ion-checklist"></div>
+            </div>
+
+            <div class="visual-container">
+                <div class="svg-wrapper">
+                    <!-- Test Tube View -->
+                    <svg id="view-tube" viewBox="0 0 100 220">
+                        <defs>
+                            <radialGradient id="tube-glow" cx="50%" cy="70%" r="50%">
+                                <stop offset="0%" stop-color="rgba(100,150,255,0.1)"/>
+                                <stop offset="100%" stop-color="transparent"/>
+                            </radialGradient>
+                            <linearGradient id="glass-reflection" x1="0" x2="1">
+                                <stop offset="0%" stop-color="rgba(255,255,255,0.15)"/>
+                                <stop offset="30%" stop-color="rgba(255,255,255,0.02)"/>
+                                <stop offset="70%" stop-color="rgba(255,255,255,0.02)"/>
+                                <stop offset="100%" stop-color="rgba(255,255,255,0.1)"/>
+                            </linearGradient>
+                            <clipPath id="tube-clip">
+                                <path d="M33,148 Q33,178 50,178 Q67,178 67,148 L67,45 L33,45 Z"/>
+                            </clipPath>
+                        </defs>
+                        
+                        <ellipse cx="50" cy="120" rx="35" ry="50" fill="url(#tube-glow)"/>
+                        <g id="gas-layer"></g>
+                        <path d="M30,40 L30,148 Q30,182 50,182 Q70,182 70,148 L70,40" fill="rgba(255,255,255,0.03)"/>
+                        
+                        <g clip-path="url(#tube-clip)">
+                            <rect id="liquid" x="31" y="85" width="38" height="95" fill="#a0d4ff" opacity="0.4" class="liquid"/>
+                            <rect id="brown-ring" x="31" y="85" width="38" height="5" fill="#4a2c2a" opacity="0"/>
+                            <path id="precipitate" d="M33,150 Q50,155 67,150 L67,180 Q50,180 33,180 Z" opacity="0" fill="#ffffff" class="precipitate"/>
+                            <g id="bubbles"></g>
+                            <circle id="paper-ball" cx="50" cy="130" r="6" fill="#b0b0b0" stroke="#888" stroke-width="0.5" opacity="0"/>
+                        </g>
+                        
+                        <path d="M30,40 L30,148 Q30,182 50,182 Q70,182 70,148 L70,40" fill="url(#glass-reflection)" stroke="rgba(255,255,255,0.3)" stroke-width="1.5"/>
+                        <ellipse cx="50" cy="40" rx="20" ry="4" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="1.5"/>
+                        
+                        <g id="glass-rod" opacity="0">
+                            <line x1="75" y1="30" x2="85" y2="10" stroke="#ddd" stroke-width="2" stroke-linecap="round"/>
+                            <circle cx="85" cy="10" r="3" fill="#fff" opacity="0.8"/>
+                        </g>
+                        
+                        <g id="smell-indicator" opacity="0">
+                            <text x="50" y="20" fill="#ffcc00" font-size="8" text-anchor="middle">👃 Smell</text>
+                        </g>
+                    </svg>
+
+                    <!-- Flame Test View -->
+                    <svg id="view-flame" viewBox="0 0 100 220" style="display: none;">
+                        <defs>
+                            <radialGradient id="flame-glow" cx="50%" cy="80%" r="60%">
+                                <stop offset="0%" stop-color="rgba(255,150,50,0.3)"/>
+                                <stop offset="100%" stop-color="transparent"/>
+                            </radialGradient>
+                        </defs>
+                        
+                        <ellipse cx="50" cy="130" rx="40" ry="60" fill="url(#flame-glow)"/>
+                        <rect x="42" y="170" width="16" height="40" fill="#444" stroke="#555"/>
+                        <rect x="38" y="165" width="24" height="8" fill="#555" stroke="#666" rx="2"/>
+                        <path class="flame-outer" id="flame-outer" d="M35,165 Q50,80 65,165" fill="orange" opacity="0.7" filter="url(#glow)"/>
+                        <path class="flame-inner" id="flame-inner" d="M42,165 Q50,100 58,165" fill="#ffcc00" opacity="0.9"/>
+                        <path id="flame-core" d="M46,165 Q50,120 54,165" fill="#fff" opacity="0.6"/>
+                        <text x="50" y="200" fill="#808080" font-size="9" text-anchor="middle">Flame Test</text>
+                    </svg>
+
+                    <!-- Ash Test View -->
+                    <svg id="view-ash" viewBox="0 0 100 220" style="display: none;">
+                        <rect id="ash-paper" x="25" y="70" width="50" height="60" fill="#404040" stroke="#555" rx="2"/>
+                        <text x="50" y="160" fill="#808080" font-size="9" text-anchor="middle">Ash Test</text>
+                        <text id="ash-label" x="50" y="175" fill="#e0e0e0" font-size="10" text-anchor="middle" font-weight="600"></text>
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- Controls Panel -->
+        <div class="controls-panel">
+            <!-- Log Console -->
+            <div class="log-container">
+                <div class="log-header">Observations</div>
+                <div class="log-box" id="log">
+                    <div class="log-entry">Ready for analysis.</div>
+                </div>
+            </div>
+
+            <!-- Tab Navigation (Mobile) -->
+            <nav class="tab-nav">
+                <div class="tab-nav-inner">
+                    <button class="tab-btn active" data-tab="actions">
+                        <span>⚡</span>Actions
+                    </button>
+                    <button class="tab-btn" data-tab="acids">
+                        <span>🧪</span>Acids
+                    </button>
+                    <button class="tab-btn" data-tab="groups">
+                        <span>🔬</span>Groups
+                    </button>
+                    <button class="tab-btn" data-tab="conf">
+                        <span>✓</span>Confirm
+                    </button>
+                </div>
+            </nav>
+
+            <!-- Scrollable Controls -->
+            <div class="controls-content">
+                <!-- Actions -->
+                <div class="qt-groupbox active" id="tab-actions">
+                    <div class="qt-groupbox-title" onclick="toggleGroup(this.parentElement)">
+                        <span>⚡</span> Actions
+                    </div>
+                    <div class="qt-groupbox-content">
+                        <div class="qt-btn-grid">
+                            <button class="qt-btn qt-btn-action" onclick="game.performAction('heat')">
+                                <span class="qt-btn-icon">🔥</span>Heat
+                            </button>
+                            <button class="qt-btn qt-btn-action" onclick="game.performAction('flame_test')">
+                                <span class="qt-btn-icon">🕯️</span>Flame
+                            </button>
+                            <button class="qt-btn qt-btn-action" onclick="game.performAction('ash_test')">
+                                <span class="qt-btn-icon">📄</span>Ash
+                            </button>
+                            <button class="qt-btn qt-btn-action" onclick="game.performAction('paper_ball')">
+                                <span class="qt-btn-icon">🧻</span>Paper
+                            </button>
+                            <button class="qt-btn qt-btn-action" onclick="game.performAction('smell_test')">
+                                <span class="qt-btn-icon">👃</span>Smell
+                            </button>
+                            <button class="qt-btn qt-btn-danger" onclick="game.resetTube()">
+                                <span class="qt-btn-icon">💧</span>Wash
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Acids -->
+                <div class="qt-groupbox" id="tab-acids">
+                    <div class="qt-groupbox-title" onclick="toggleGroup(this.parentElement)">
+                        <span>🧪</span> Acids & Bases
+                    </div>
+                    <div class="qt-groupbox-content">
+                        <div class="qt-btn-grid" id="grid-acids"></div>
+                    </div>
+                </div>
+
+                <!-- Groups -->
+                <div class="qt-groupbox" id="tab-groups">
+                    <div class="qt-groupbox-title" onclick="toggleGroup(this.parentElement)">
+                        <span>🔬</span> Group Separation
+                    </div>
+                    <div class="qt-groupbox-content">
+                        <div class="qt-btn-grid" id="grid-groups"></div>
+                    </div>
+                </div>
+
+                <!-- Confirmatory -->
+                <div class="qt-groupbox" id="tab-conf">
+                    <div class="qt-groupbox-title" onclick="toggleGroup(this.parentElement)">
+                        <span>✓</span> Confirmatory
+                    </div>
+                    <div class="qt-groupbox-content">
+                        <div class="qt-btn-grid" id="grid-conf"></div>
+                    </div>
+                </div>
+
+                <!-- Deduction Panel -->
+                <div class="deduction-panel">
+                    <div class="deduction-title">
+                        <span>🎯</span> Submit Answer
+                    </div>
+                    <div class="deduction-content">
+                        <div class="guess-row">
+                            <select class="qt-select" id="sel-cation">
+                                <option value="" disabled selected>Cation...</option>
+                                <option value="NH4">NH₄⁺ (Ammonium)</option>
+                                <option value="Pb">Pb²⁺ (Lead)</option>
+                                <option value="Cu">Cu²⁺ (Copper)</option>
+                                <option value="Al">Al³⁺ (Aluminium)</option>
+                                <option value="Zn">Zn²⁺ (Zinc)</option>
+                                <option value="Ba">Ba²⁺ (Barium)</option>
+                                <option value="Ca">Ca²⁺ (Calcium)</option>
+                                <option value="Mg">Mg²⁺ (Magnesium)</option>
+                            </select>
+                            <select class="qt-select" id="sel-anion">
+                                <option value="" disabled selected>Anion...</option>
+                                <option value="CO3">CO₃²⁻ (Carbonate)</option>
+                                <option value="CH3COO">CH₃COO⁻ (Acetate)</option>
+                                <option value="Cl">Cl⁻ (Chloride)</option>
+                                <option value="NO3">NO₃⁻ (Nitrate)</option>
+                                <option value="SO4">SO₄²⁻ (Sulphate)</option>
+                            </select>
+                        </div>
+                        <button class="qt-btn qt-btn-submit" onclick="game.submitGuess()">
+                            SUBMIT
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Reagent Data
+        const REAGENTS = {
+            acids: [
+                { id: 'dil_hcl', label: 'Dil. HCl' },
+                { id: 'dil_h2so4', label: 'Dil. H₂SO₄' },
+                { id: 'conc_h2so4', label: 'Conc. H₂SO₄' },
+                { id: 'dil_acetic', label: 'CH₃COOH' },
+                { id: 'dil_hno3', label: 'Dil. HNO₃' },
+                { id: 'naoh', label: 'NaOH' },
+                { id: 'conc_hcl', label: 'Conc. HCl' }
+            ],
+            groups: [
+                { id: 'na2co3', label: 'Na₂CO₃' },
+                { id: 'h2s', label: 'H₂S Gas' },
+                { id: 'nh4cl', label: 'NH₄Cl' },
+                { id: 'nh4oh', label: 'NH₄OH' },
+                { id: 'nh42co3', label: '(NH₄)₂CO₃' },
+                { id: 'na2hpo4', label: 'Na₂HPO₄' },
+                { id: 'lime_water', label: 'Lime Water' }
+            ],
+            confirmatory: [
+                { id: 'bacl2', label: 'BaCl₂' },
+                { id: 'agno3', label: 'AgNO₃' },
+                { id: 'feso4', label: 'FeSO₄' },
+                { id: 'fecl3', label: 'FeCl₃' },
+                { id: 'lead_acetate', label: 'Pb Acetate' },
+                { id: 'ki', label: 'KI' },
+                { id: 'k2cro4', label: 'K₂CrO₄' },
+                { id: 'nessler', label: "Nessler's" },
+                { id: 'amm_oxalate', label: 'Amm. Oxalate' },
+                { id: 'magneson', label: 'Magneson' },
+                { id: 'cobalt_nitrate', label: 'Co(NO₃)₂' },
+                { id: 'amm_acetate', label: 'Amm. Acetate' }
+            ]
+        };
+
+        const ANIONS = ['CO3', 'CH3COO', 'Cl', 'NO3', 'SO4'];
+        const CATIONS = ['NH4', 'Pb', 'Cu', 'Al', 'Zn', 'Ba', 'Ca', 'Mg'];
+
+        // Toggle group collapse
+        function toggleGroup(el) {
+            if (window.innerWidth >= 600) {
+                el.classList.toggle('collapsed');
+            }
+        }
+
+        // Tab Navigation
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                
+                const tabId = btn.dataset.tab;
+                document.querySelectorAll('.qt-groupbox').forEach(g => g.classList.remove('active'));
+                document.getElementById(`tab-${tabId}`).classList.add('active');
+            });
+        });
+
+        // Toast notification
+        function showToast(msg, type = '') {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.className = 'toast show ' + type;
+            setTimeout(() => toast.classList.remove('show'), 2500);
+        }
+
+        // Main Game Class
+        class SaltAnalysisGame {
+            constructor() {
+                this.deck = [];
+                this.currentSalt = null;
+                this.lap = 0;
+                this.tube = { reagents: [], heated: false, paper: false, smellChecked: false };
+                this.foundIons = new Set();
+                this.logEl = document.getElementById('log');
+                this.initVisuals();
+                this.initGame();
+            }
+
+            initVisuals() {
+                this.elTube = document.getElementById('view-tube');
+                this.elFlame = document.getElementById('view-flame');
+                this.elAsh = document.getElementById('view-ash');
+                this.elLiquid = document.getElementById('liquid');
+                this.elPpt = document.getElementById('precipitate');
+                this.elGas = document.getElementById('gas-layer');
+                this.elBubbles = document.getElementById('bubbles');
+                this.elRing = document.getElementById('brown-ring');
+                this.elPaperBall = document.getElementById('paper-ball');
+                this.elGlassRod = document.getElementById('glass-rod');
+                this.elSmellIndicator = document.getElementById('smell-indicator');
+            }
+
+            initGame() {
+                this.foundIons.clear();
+                this.lap = 0;
+                this.generateDeck();
+                this.renderChecklist();
+                this.renderReagents();
+                this.nextSalt();
+                document.getElementById('win-screen').style.display = 'none';
+            }
+
+            generateDeck() {
+                const cations = [...CATIONS].sort(() => 0.5 - Math.random());
+                const anions = [...ANIONS, ...ANIONS, ...ANIONS].slice(0, 8).sort(() => 0.5 - Math.random());
+                this.deck = [];
+                for (let i = 0; i < 8; i++) {
+                    this.deck.push({ cation: cations[i], anion: anions[i] });
+                }
+            }
+
+            renderReagents() {
+                const render = (id, list, cls) => {
+                    const el = document.getElementById(id);
+                    el.innerHTML = '';
+                    list.forEach(r => {
+                        const btn = document.createElement('button');
+                        btn.className = `qt-btn ${cls}`;
+                        btn.innerHTML = r.label;
+                        btn.onclick = () => this.addReagent(r.id);
+                        el.appendChild(btn);
+                    });
+                };
+                render('grid-acids', REAGENTS.acids, 'qt-btn-acid');
+                render('grid-groups', REAGENTS.groups, 'qt-btn-group');
+                render('grid-conf', REAGENTS.confirmatory, 'qt-btn-conf');
+            }
+
+            renderChecklist() {
+                const div = document.getElementById('ion-checklist');
+                div.innerHTML = '';
+                [...CATIONS, ...ANIONS].forEach(ion => {
+                    const span = document.createElement('span');
+                    span.className = 'check-item' + (this.foundIons.has(ion) ? ' done' : '');
+                    span.textContent = ion;
+                    div.appendChild(span);
+                });
+            }
+
+            nextSalt() {
+                if (this.deck.length === 0) {
+                    document.getElementById('win-screen').style.display = 'flex';
+                    return;
+                }
+                this.currentSalt = this.deck.pop();
+                this.lap++;
+                document.getElementById('lap-display').textContent = `Salt ${this.lap}/8`;
+                this.resetTube();
+                this.log(`<b style="color:#0078d4">Salt #${this.lap} loaded</b>`);
+            }
+
+            resetTube() {
+                this.tube = { reagents: [], heated: false, paper: false, smellChecked: false };
+                this.showView('tube');
+                this.elLiquid.setAttribute('opacity', '0.4');
+                this.elLiquid.setAttribute('fill', '#a0d4ff');
+                this.elLiquid.setAttribute('y', '85');
+                this.elPpt.setAttribute('opacity', '0');
+                this.elPpt.style.filter = 'none';
+                this.elRing.setAttribute('opacity', '0');
+                this.elPaperBall.setAttribute('opacity', '0');
+                this.elGlassRod.setAttribute('opacity', '0');
+                this.elSmellIndicator.setAttribute('opacity', '0');
+                this.elGas.innerHTML = '';
+                this.elBubbles.innerHTML = '';
+                this.log('Tube washed.');
+            }
+
+            showView(view) {
+                this.elTube.style.display = view === 'tube' ? 'block' : 'none';
+                this.elFlame.style.display = view === 'flame' ? 'block' : 'none';
+                this.elAsh.style.display = view === 'ash' ? 'block' : 'none';
+            }
+
+            log(msg) {
+                const entry = document.createElement('div');
+                entry.className = 'log-entry';
+                entry.innerHTML = msg;
+                this.logEl.appendChild(entry);
+                this.logEl.scrollTop = this.logEl.scrollHeight;
+            }
+
+            addReagent(id) {
+                this.showView('tube');
+                this.tube.reagents.push(id);
+                const reagent = [...Object.values(REAGENTS).flat()].find(r => r.id === id);
+                this.log(`Added ${reagent ? reagent.label : id}`);
+                this.animateMix();
+                setTimeout(() => this.evaluate(), 300);
+            }
+
+            animateMix() {
+                const liquid = this.elLiquid;
+                const y = parseFloat(liquid.getAttribute('y'));
+                liquid.setAttribute('y', y - 2);
+                setTimeout(() => liquid.setAttribute('y', y), 200);
+            }
+
+            performAction(action) {
+                this.showView('tube');
+                
+                switch(action) {
+                    case 'heat':
+                        this.tube.heated = true;
+                        this.log('🔥 Heating...');
+                        this.animateHeat();
+                        setTimeout(() => this.evaluate(), 500);
+                        break;
+                    case 'paper_ball':
+                        this.tube.paper = true;
+                        this.elPaperBall.setAttribute('opacity', '1');
+                        this.log('Added paper ball.');
+                        setTimeout(() => this.evaluate(), 300);
+                        break;
+                    case 'smell_test':
+                        this.tube.smellChecked = true;
+                        this.log('👃 Checking smell...');
+                        this.evaluate();
+                        break;
+                    case 'flame_test':
+                        this.showFlameTest();
+                        break;
+                    case 'ash_test':
+                        this.showAshTest();
+                        break;
+                }
+            }
+
+            animateHeat() {
+                const liquid = this.elLiquid;
+                const originalFill = liquid.getAttribute('fill');
+                liquid.setAttribute('fill', '#ffcc80');
+                
+                for (let i = 0; i < 5; i++) {
+                    setTimeout(() => {
+                        const bubble = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                        bubble.setAttribute('cx', 40 + Math.random() * 20);
+                        bubble.setAttribute('cy', 160);
+                        bubble.setAttribute('r', 1 + Math.random() * 2);
+                        bubble.setAttribute('fill', 'rgba(255,255,255,0.5)');
+                        bubble.classList.add('bubble');
+                        this.elBubbles.appendChild(bubble);
+                        setTimeout(() => bubble.remove(), 2000);
+                    }, i * 100);
+                }
+                
+                setTimeout(() => liquid.setAttribute('fill', originalFill), 1500);
+            }
+
+            evaluate() {
+                const r = this.tube.reagents;
+                const c = this.currentSalt.cation;
+                const a = this.currentSalt.anion;
+                const has = (x) => r.includes(x);
+                const hasAll = (...x) => x.every(y => r.includes(y));
+
+                // === ANIONS ===
+                
+                // Carbonate
+                if (a === 'CO3' && has('dil_hcl') && !has('bacl2') && !has('agno3')) {
+                    this.visBubbles();
+                    this.log('⚗️ Brisk effervescence!');
+                    if (has('lime_water')) this.log('💨 Lime water turns milky!');
+                }
+                if (a === 'CO3' && has('bacl2')) {
+                    this.visPpt('#fff', '');
+                    this.log('⬜ White precipitate (BaCO₃)');
+                    if (has('dil_hcl')) {
+                        this.visBubbles();
+                        this.log('💨 Dissolves with effervescence!');
+                    }
+                }
+
+                // Acetate
+                if (a === 'CH3COO' && has('dil_h2so4') && this.tube.smellChecked) {
+                    this.elSmellIndicator.setAttribute('opacity', '1');
+                    this.log('👃 <span style="color:#ffeb3b">Vinegar smell!</span>');
+                }
+                if (a === 'CH3COO' && has('fecl3')) {
+                    this.elLiquid.setAttribute('fill', '#8B4513');
+                    this.elLiquid.setAttribute('opacity', '0.8');
+                    this.log('🟤 Reddish-brown color');
+                }
+
+                // Chloride
+                if (a === 'Cl' && has('conc_h2so4')) {
+                    this.visFume('#fff', 0.6);
+                    this.log('💨 Colorless gas, fumes in air');
+                    if (has('nh4oh') || has('conc_hcl')) {
+                        this.elGlassRod.setAttribute('opacity', '1');
+                        this.visFume('#fff', 0.9);
+                        this.log('⚪ Dense white fumes!');
+                    }
+                }
+                if (a === 'Cl' && hasAll('dil_hno3', 'agno3')) {
+                    this.visPpt('#f5f5f5', 'curdy');
+                    this.log('⬜ White curdy precipitate (AgCl)');
+                    if (has('nh4oh')) {
+                        this.elPpt.setAttribute('opacity', '0.2');
+                        this.log('💧 Dissolves in NH₄OH!');
+                    }
+                }
+
+                // Nitrate
+                if (a === 'NO3' && has('conc_h2so4') && this.tube.paper && this.tube.heated) {
+                    this.visFume('#8B4513', 0.8);
+                    this.log('🟤 <span style="color:#cd5c5c">Brown vapors (NO₂)!</span>');
+                }
+                if (a === 'NO3' && hasAll('feso4', 'conc_h2so4')) {
+                    this.elRing.setAttribute('opacity', '1');
+                    this.log('🟤 <span style="color:#8b4513">Brown ring formed!</span>');
+                }
+
+                // Sulphate
+                if (a === 'SO4' && has('bacl2')) {
+                    this.visPpt('#fff', '');
+                    this.log('⬜ White precipitate (BaSO₄)');
+                    if (has('dil_hcl')) this.log('⚠️ Insoluble in HCl');
+                }
+                if (a === 'SO4' && hasAll('dil_acetic', 'lead_acetate')) {
+                    this.visPpt('#fff', '');
+                    this.log('⬜ White precipitate (PbSO₄)');
+                    if (has('amm_acetate')) {
+                        this.elPpt.setAttribute('opacity', '0.2');
+                        this.log('💧 Dissolves in ammonium acetate!');
+                    }
+                }
+
+                // === CATIONS ===
+
+                // Zero Group Test
+                if (has('na2co3')) {
+                    if (c === 'NH4') {
+                        this.log('✓ No precipitate (Zero group present)');
+                    } else {
+                        this.visPpt(c === 'Cu' ? '#48D1CC' : '#fff', '');
+                        this.log('⬜ Precipitate formed (Zero group absent)');
+                    }
+                }
+
+                // NH4+
+                if (c === 'NH4' && has('naoh') && this.tube.heated) {
+                    this.visFume('#e0e0e0', 0.5);
+                    this.log('💨 Pungent gas (NH₃)!');
+                    if (has('conc_hcl')) {
+                        this.elGlassRod.setAttribute('opacity', '1');
+                        this.visFume('#fff', 0.9);
+                        this.log('⚪ White fumes with HCl!');
+                    }
+                }
+                if (c === 'NH4' && has('nessler')) {
+                    this.visPpt('#8B4513', '');
+                    this.log('🟤 Brown precipitate!');
+                }
+
+                // Pb2+
+                if (c === 'Pb' && has('dil_hcl') && !has('h2s')) {
+                    this.visPpt('#fff', '');
+                    this.log('⬜ White precipitate (PbCl₂)');
+                }
+                if (c === 'Pb' && has('ki')) {
+                    this.visPpt('#FFD700', 'crystalline');
+                    this.log('💛 Golden yellow precipitate!');
+                    if (this.tube.heated) {
+                        this.elPpt.setAttribute('opacity', '0.2');
+                        this.log('💧 Dissolves on heating...');
+                        setTimeout(() => {
+                            this.visPpt('#FFD700', 'crystalline');
+                            this.log('✨ Golden spangles on cooling!');
+                        }, 1500);
+                    }
+                }
+                if (c === 'Pb' && hasAll('dil_acetic', 'k2cro4')) {
+                    this.visPpt('#FFFF00', '');
+                    this.log('💛 Yellow precipitate (PbCrO₄)!');
+                }
+
+                // Cu2+
+                if (c === 'Cu' && hasAll('dil_hcl', 'h2s')) {
+                    this.visPpt('#000', '');
+                    this.log('⬛ Black precipitate (CuS)!');
+                }
+
+                // Al3+
+                if (c === 'Al' && hasAll('nh4cl', 'nh4oh') && !has('h2s')) {
+                    this.visPpt('rgba(240,240,255,0.9)', 'gelatinous');
+                    this.log('🔘 White gelatinous precipitate!');
+                }
+                if (c === 'Al' && has('naoh')) {
+                    this.visPpt('rgba(240,240,255,0.8)', 'gelatinous');
+                    this.log('🔘 White gelatinous precipitate');
+                    if (r.filter(x => x === 'naoh').length >= 2) {
+                        this.elPpt.setAttribute('opacity', '0.1');
+                        this.log('💧 Dissolves in excess NaOH!');
+                    }
+                }
+
+                // Zn2+
+                if (c === 'Zn' && hasAll('nh4cl', 'nh4oh', 'h2s')) {
+                    this.visPpt('#F5F5DC', '');
+                    this.log('⬜ Dirty white precipitate (ZnS)!');
+                }
+                if (c === 'Zn' && has('naoh')) {
+                    this.visPpt('#fff', '');
+                    this.log('⬜ White precipitate');
+                    if (r.filter(x => x === 'naoh').length >= 2) {
+                        this.elPpt.setAttribute('opacity', '0.1');
+                        this.log('💧 Dissolves in excess NaOH!');
+                    }
+                }
+
+                // Ba2+ / Ca2+
+                if ((c === 'Ba' || c === 'Ca') && hasAll('nh4cl', 'nh4oh', 'nh42co3')) {
+                    this.visPpt('#fff', '');
+                    this.log('⬜ White precipitate (Group V)');
+                }
+                if (c === 'Ba' && hasAll('dil_acetic', 'k2cro4')) {
+                    this.visPpt('#FFFF00', '');
+                    this.log('💛 Yellow precipitate (BaCrO₄)!');
+                }
+                if (c === 'Ca' && hasAll('nh4oh', 'amm_oxalate')) {
+                    this.visPpt('#fff', '');
+                    this.log('⬜ White precipitate (CaC₂O₄)!');
+                }
+
+                // Mg2+
+                if (c === 'Mg' && hasAll('nh4cl', 'nh4oh', 'na2hpo4')) {
+                    this.visPpt('#fff', 'crystalline');
+                    this.log('⬜ White crystalline precipitate!');
+                }
+                if (c === 'Mg' && has('magneson')) {
+                    this.visPpt('#4169E1', '');
+                    this.elLiquid.setAttribute('fill', '#4682B4');
+                    this.log('🔵 Blue precipitate!');
+                    if (has('naoh')) {
+                        this.elLiquid.setAttribute('fill', '#000080');
+                        this.log('🔵 Deep blue in excess NaOH!');
+                    }
+                }
+            }
+
+            visPpt(color, type) {
+                this.elPpt.setAttribute('opacity', '1');
+                this.elPpt.setAttribute('fill', color);
+                this.elPpt.style.filter = type === 'gelatinous' ? 'url(#gelatinous)' : 
+                                          type === 'curdy' ? 'url(#curdy)' : 
+                                          type === 'crystalline' ? 'url(#crystalline)' : 'none';
+            }
+
+            visBubbles() {
+                this.elBubbles.innerHTML = '';
+                for (let i = 0; i < 12; i++) {
+                    setTimeout(() => {
+                        const bubble = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                        bubble.setAttribute('cx', 35 + Math.random() * 30);
+                        bubble.setAttribute('cy', 165);
+                        bubble.setAttribute('r', 1.5 + Math.random() * 2);
+                        bubble.setAttribute('fill', 'rgba(255,255,255,0.7)');
+                        bubble.classList.add('bubble');
+                        this.elBubbles.appendChild(bubble);
+                        setTimeout(() => bubble.remove(), 2500);
+                    }, i * 80);
+                }
+            }
+
+            visFume(color, opacity) {
+                for (let i = 0; i < 3; i++) {
+                    const fume = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse');
+                    fume.setAttribute('cx', 45 + Math.random() * 10);
+                    fume.setAttribute('cy', 35);
+                    fume.setAttribute('rx', 8 + Math.random() * 5);
+                    fume.setAttribute('ry', 5 + Math.random() * 3);
+                    fume.setAttribute('fill', color);
+                    fume.setAttribute('opacity', opacity);
+                    fume.style.filter = 'blur(3px)';
+                    fume.classList.add('fume');
+                    fume.style.animationDelay = (i * 0.3) + 's';
+                    this.elGas.appendChild(fume);
+                }
+            }
+
+            showFlameTest() {
+                this.showView('flame');
+                const c = this.currentSalt.cation;
+                const outer = document.getElementById('flame-outer');
+                const inner = document.getElementById('flame-inner');
+                
+                let color = 'orange', innerC = '#ffcc00', msg = 'No characteristic color';
+                
+                if (c === 'Ba') { color = '#32CD32'; innerC = '#90EE90'; msg = '🟢 Green flame! (Ba)'; }
+                else if (c === 'Ca') { color = '#DC143C'; innerC = '#FF6347'; msg = '🔴 Brick red flame! (Ca)'; }
+                else if (c === 'Cu') { color = '#00CED1'; innerC = '#40E0D0'; msg = '🔵 Blue-green flame! (Cu)'; }
+                
+                outer.setAttribute('fill', color);
+                inner.setAttribute('fill', innerC);
+                this.log(`🕯️ ${msg}`);
+            }
+
+            showAshTest() {
+                if (!this.tube.reagents.includes('cobalt_nitrate')) {
+                    showToast('Add Co(NO₃)₂ first!', 'error');
+                    return;
+                }
+                
+                this.showView('ash');
+                const c = this.currentSalt.cation;
+                const paper = document.getElementById('ash-paper');
+                const label = document.getElementById('ash-label');
+                
+                let color = '#555', name = 'No color';
+                
+                if (c === 'Al') { color = '#87CEEB'; name = 'Blue'; this.log('🔵 Blue ash! (Al)'); }
+                else if (c === 'Zn') { color = '#90EE90'; name = 'Green'; this.log('🟢 Green ash! (Zn)'); }
+                else if (c === 'Mg') { color = '#FFB6C1'; name = 'Pink'; this.log('🩷 Pink ash! (Mg)'); }
+                else this.log('No characteristic ash color');
+                
+                paper.setAttribute('fill', color);
+                label.textContent = name;
+            }
+
+            submitGuess() {
+                const cation = document.getElementById('sel-cation').value;
+                const anion = document.getElementById('sel-anion').value;
+                
+                if (!cation || !anion) {
+                    showToast('Select both ions!', 'error');
+                    return;
+                }
+                
+                if (cation === this.currentSalt.cation && anion === this.currentSalt.anion) {
+                    this.log(`<span style="color:#4caf50;font-weight:bold">✅ CORRECT!</span>`);
+                    showToast('Correct! 🎉', 'success');
+                    this.foundIons.add(this.currentSalt.cation);
+                    this.foundIons.add(this.currentSalt.anion);
+                    this.renderChecklist();
+                    document.getElementById('sel-cation').value = '';
+                    document.getElementById('sel-anion').value = '';
+                    setTimeout(() => this.nextSalt(), 1000);
+                } else {
+                    this.log(`<span style="color:#f44336;font-weight:bold">❌ WRONG</span>`);
+                    showToast('Incorrect. Try again!', 'error');
+                }
+            }
+        }
+
+        // Initialize
+        const game = new SaltAnalysisGame();
+
+        // Prevent zoom on double tap
+        document.addEventListener('touchend', (e) => {
+            const now = Date.now();
+            if (now - (window.lastTap || 0) < 300) e.preventDefault();
+            window.lastTap = now;
+        }, { passive: false });
+    </script>
+</body>
+</html>
