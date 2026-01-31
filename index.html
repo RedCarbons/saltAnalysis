@@ -199,21 +199,6 @@
             transition: fill 0.4s ease, opacity 0.5s ease;
         }
 
-        .flame-outer {
-            animation: flame-flicker 0.15s infinite alternate;
-            transform-origin: center bottom;
-        }
-
-        .flame-inner {
-            animation: flame-flicker 0.1s infinite alternate-reverse;
-            transform-origin: center bottom;
-        }
-
-        @keyframes flame-flicker {
-            0% { transform: scale(1, 1) skewX(0deg); opacity: 0.9; }
-            100% { transform: scale(1.03, 1.05) skewX(2deg); opacity: 1; }
-        }
-
         .bubble {
             animation: bubble-rise 2s ease-in infinite;
         }
@@ -826,7 +811,7 @@
             <span class="app-title-icon">🧪</span>
             <span>Salt Analysis Lab</span>
         </div>
-        <div class="salt-badge" id="lap-display">Salt 1/8</div>
+        <div class="salt-badge" id="lap-display">Salt 1/5</div>
     </header>
 
     <!-- Main Container -->
@@ -883,24 +868,6 @@
                         </g>
                     </svg>
 
-                    <!-- Flame Test View -->
-                    <svg id="view-flame" viewBox="0 0 100 220" style="display: none;">
-                        <defs>
-                            <radialGradient id="flame-glow" cx="50%" cy="80%" r="60%">
-                                <stop offset="0%" stop-color="rgba(255,150,50,0.3)"/>
-                                <stop offset="100%" stop-color="transparent"/>
-                            </radialGradient>
-                        </defs>
-                        
-                        <ellipse cx="50" cy="130" rx="40" ry="60" fill="url(#flame-glow)"/>
-                        <rect x="42" y="170" width="16" height="40" fill="#444" stroke="#555"/>
-                        <rect x="38" y="165" width="24" height="8" fill="#555" stroke="#666" rx="2"/>
-                        <path class="flame-outer" id="flame-outer" d="M35,165 Q50,80 65,165" fill="orange" opacity="0.7" filter="url(#glow)"/>
-                        <path class="flame-inner" id="flame-inner" d="M42,165 Q50,100 58,165" fill="#ffcc00" opacity="0.9"/>
-                        <path id="flame-core" d="M46,165 Q50,120 54,165" fill="#fff" opacity="0.6"/>
-                        <text x="50" y="200" fill="#808080" font-size="9" text-anchor="middle">Flame Test</text>
-                    </svg>
-
                     <!-- Ash Test View -->
                     <svg id="view-ash" viewBox="0 0 100 220" style="display: none;">
                         <rect id="ash-paper" x="25" y="70" width="50" height="60" fill="#404040" stroke="#555" rx="2"/>
@@ -950,9 +917,6 @@
                         <div class="qt-btn-grid">
                             <button class="qt-btn qt-btn-action" onclick="game.performAction('heat')">
                                 <span class="qt-btn-icon">🔥</span>Heat
-                            </button>
-                            <button class="qt-btn qt-btn-action" onclick="game.performAction('flame_test')">
-                                <span class="qt-btn-icon">🕯️</span>Flame
                             </button>
                             <button class="qt-btn qt-btn-action" onclick="game.performAction('ash_test')">
                                 <span class="qt-btn-icon">📄</span>Ash
@@ -1011,12 +975,8 @@
                                 <option value="" disabled selected>Cation...</option>
                                 <option value="NH4">NH₄⁺ (Ammonium)</option>
                                 <option value="Pb">Pb²⁺ (Lead)</option>
-                                <option value="Cu">Cu²⁺ (Copper)</option>
                                 <option value="Al">Al³⁺ (Aluminium)</option>
                                 <option value="Zn">Zn²⁺ (Zinc)</option>
-                                <option value="Ba">Ba²⁺ (Barium)</option>
-                                <option value="Ca">Ca²⁺ (Calcium)</option>
-                                <option value="Mg">Mg²⁺ (Magnesium)</option>
                             </select>
                             <select class="qt-select" id="sel-anion">
                                 <option value="" disabled selected>Anion...</option>
@@ -1037,7 +997,7 @@
     </div>
 
     <script>
-        // Reagent Data
+        // Reagent Data (Reduced set)
         const REAGENTS = {
             acids: [
                 { id: 'dil_hcl', label: 'Dil. HCl' },
@@ -1053,8 +1013,6 @@
                 { id: 'h2s', label: 'H₂S Gas' },
                 { id: 'nh4cl', label: 'NH₄Cl' },
                 { id: 'nh4oh', label: 'NH₄OH' },
-                { id: 'nh42co3', label: '(NH₄)₂CO₃' },
-                { id: 'na2hpo4', label: 'Na₂HPO₄' },
                 { id: 'lime_water', label: 'Lime Water' }
             ],
             confirmatory: [
@@ -1066,15 +1024,14 @@
                 { id: 'ki', label: 'KI' },
                 { id: 'k2cro4', label: 'K₂CrO₄' },
                 { id: 'nessler', label: "Nessler's" },
-                { id: 'amm_oxalate', label: 'Amm. Oxalate' },
-                { id: 'magneson', label: 'Magneson' },
                 { id: 'cobalt_nitrate', label: 'Co(NO₃)₂' },
                 { id: 'amm_acetate', label: 'Amm. Acetate' }
             ]
         };
 
         const ANIONS = ['CO3', 'CH3COO', 'Cl', 'NO3', 'SO4'];
-        const CATIONS = ['NH4', 'Pb', 'Cu', 'Al', 'Zn', 'Ba', 'Ca', 'Mg'];
+        const CATIONS = ['NH4', 'Pb', 'Al', 'Zn'];
+        const TOTAL_SALTS = 5;
 
         // Toggle group collapse
         function toggleGroup(el) {
@@ -1118,7 +1075,6 @@
 
             initVisuals() {
                 this.elTube = document.getElementById('view-tube');
-                this.elFlame = document.getElementById('view-flame');
                 this.elAsh = document.getElementById('view-ash');
                 this.elLiquid = document.getElementById('liquid');
                 this.elPpt = document.getElementById('precipitate');
@@ -1141,11 +1097,12 @@
             }
 
             generateDeck() {
+                // Create 5 salts covering all anions and cycling through cations
                 const cations = [...CATIONS].sort(() => 0.5 - Math.random());
-                const anions = [...ANIONS, ...ANIONS, ...ANIONS].slice(0, 8).sort(() => 0.5 - Math.random());
+                const anions = [...ANIONS].sort(() => 0.5 - Math.random());
                 this.deck = [];
-                for (let i = 0; i < 8; i++) {
-                    this.deck.push({ cation: cations[i], anion: anions[i] });
+                for (let i = 0; i < TOTAL_SALTS; i++) {
+                    this.deck.push({ cation: cations[i % CATIONS.length], anion: anions[i] });
                 }
             }
 
@@ -1184,7 +1141,7 @@
                 }
                 this.currentSalt = this.deck.pop();
                 this.lap++;
-                document.getElementById('lap-display').textContent = `Salt ${this.lap}/8`;
+                document.getElementById('lap-display').textContent = `Salt ${this.lap}/${TOTAL_SALTS}`;
                 this.resetTube();
                 this.log(`<b style="color:#0078d4">Salt #${this.lap} loaded</b>`);
             }
@@ -1208,7 +1165,6 @@
 
             showView(view) {
                 this.elTube.style.display = view === 'tube' ? 'block' : 'none';
-                this.elFlame.style.display = view === 'flame' ? 'block' : 'none';
                 this.elAsh.style.display = view === 'ash' ? 'block' : 'none';
             }
 
@@ -1256,9 +1212,6 @@
                         this.tube.smellChecked = true;
                         this.log('👃 Checking smell...');
                         this.evaluate();
-                        break;
-                    case 'flame_test':
-                        this.showFlameTest();
                         break;
                     case 'ash_test':
                         this.showAshTest();
@@ -1373,7 +1326,7 @@
                     if (c === 'NH4') {
                         this.log('✓ No precipitate (Zero group present)');
                     } else {
-                        this.visPpt(c === 'Cu' ? '#48D1CC' : '#fff', '');
+                        this.visPpt('#fff', '');
                         this.log('⬜ Precipitate formed (Zero group absent)');
                     }
                 }
@@ -1415,12 +1368,6 @@
                     this.log('💛 Yellow precipitate (PbCrO₄)!');
                 }
 
-                // Cu2+
-                if (c === 'Cu' && hasAll('dil_hcl', 'h2s')) {
-                    this.visPpt('#000', '');
-                    this.log('⬛ Black precipitate (CuS)!');
-                }
-
                 // Al3+
                 if (c === 'Al' && hasAll('nh4cl', 'nh4oh') && !has('h2s')) {
                     this.visPpt('rgba(240,240,255,0.9)', 'gelatinous');
@@ -1446,35 +1393,6 @@
                     if (r.filter(x => x === 'naoh').length >= 2) {
                         this.elPpt.setAttribute('opacity', '0.1');
                         this.log('💧 Dissolves in excess NaOH!');
-                    }
-                }
-
-                // Ba2+ / Ca2+
-                if ((c === 'Ba' || c === 'Ca') && hasAll('nh4cl', 'nh4oh', 'nh42co3')) {
-                    this.visPpt('#fff', '');
-                    this.log('⬜ White precipitate (Group V)');
-                }
-                if (c === 'Ba' && hasAll('dil_acetic', 'k2cro4')) {
-                    this.visPpt('#FFFF00', '');
-                    this.log('💛 Yellow precipitate (BaCrO₄)!');
-                }
-                if (c === 'Ca' && hasAll('nh4oh', 'amm_oxalate')) {
-                    this.visPpt('#fff', '');
-                    this.log('⬜ White precipitate (CaC₂O₄)!');
-                }
-
-                // Mg2+
-                if (c === 'Mg' && hasAll('nh4cl', 'nh4oh', 'na2hpo4')) {
-                    this.visPpt('#fff', 'crystalline');
-                    this.log('⬜ White crystalline precipitate!');
-                }
-                if (c === 'Mg' && has('magneson')) {
-                    this.visPpt('#4169E1', '');
-                    this.elLiquid.setAttribute('fill', '#4682B4');
-                    this.log('🔵 Blue precipitate!');
-                    if (has('naoh')) {
-                        this.elLiquid.setAttribute('fill', '#000080');
-                        this.log('🔵 Deep blue in excess NaOH!');
                     }
                 }
             }
@@ -1519,23 +1437,6 @@
                 }
             }
 
-            showFlameTest() {
-                this.showView('flame');
-                const c = this.currentSalt.cation;
-                const outer = document.getElementById('flame-outer');
-                const inner = document.getElementById('flame-inner');
-                
-                let color = 'orange', innerC = '#ffcc00', msg = 'No characteristic color';
-                
-                if (c === 'Ba') { color = '#32CD32'; innerC = '#90EE90'; msg = '🟢 Green flame! (Ba)'; }
-                else if (c === 'Ca') { color = '#DC143C'; innerC = '#FF6347'; msg = '🔴 Brick red flame! (Ca)'; }
-                else if (c === 'Cu') { color = '#00CED1'; innerC = '#40E0D0'; msg = '🔵 Blue-green flame! (Cu)'; }
-                
-                outer.setAttribute('fill', color);
-                inner.setAttribute('fill', innerC);
-                this.log(`🕯️ ${msg}`);
-            }
-
             showAshTest() {
                 if (!this.tube.reagents.includes('cobalt_nitrate')) {
                     showToast('Add Co(NO₃)₂ first!', 'error');
@@ -1551,7 +1452,6 @@
                 
                 if (c === 'Al') { color = '#87CEEB'; name = 'Blue'; this.log('🔵 Blue ash! (Al)'); }
                 else if (c === 'Zn') { color = '#90EE90'; name = 'Green'; this.log('🟢 Green ash! (Zn)'); }
-                else if (c === 'Mg') { color = '#FFB6C1'; name = 'Pink'; this.log('🩷 Pink ash! (Mg)'); }
                 else this.log('No characteristic ash color');
                 
                 paper.setAttribute('fill', color);
