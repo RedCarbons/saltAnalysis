@@ -56,7 +56,6 @@
             touch-action: manipulation;
         }
 
-        /* Scrollbar Styling */
         ::-webkit-scrollbar {
             width: 6px;
             height: 6px;
@@ -72,7 +71,6 @@
             background: var(--qt-scrollbar-hover);
         }
 
-        /* === HEADER === */
         .app-header {
             background: linear-gradient(180deg, #2a2a2a 0%, var(--qt-base) 100%);
             border-bottom: 1px solid var(--qt-border-dark);
@@ -143,7 +141,6 @@
             fill: currentColor;
         }
 
-        /* === MAIN CONTAINER === */
         .main-container {
             flex: 1;
             display: flex;
@@ -152,7 +149,6 @@
             min-height: 0;
         }
 
-        /* === LAB VIEW === */
         .lab-view {
             height: 35vh;
             min-height: 200px;
@@ -165,7 +161,6 @@
             flex-shrink: 0;
         }
 
-        /* Ion Checklist */
         .checklist-container {
             background: rgba(0,0,0,0.3);
             padding: 6px 10px;
@@ -203,7 +198,6 @@
             border-color: var(--qt-success);
         }
 
-        /* Visual Container */
         .visual-container {
             flex: 1;
             display: flex;
@@ -226,7 +220,6 @@
             overflow: visible;
         }
 
-        /* SVG Animations */
         .liquid {
             transition: fill 0.6s ease, opacity 0.5s ease, y 0.3s ease;
         }
@@ -254,7 +247,6 @@
             100% { transform: translateY(-50px); opacity: 0; }
         }
 
-        /* === CONTROLS PANEL === */
         .controls-panel {
             flex: 1;
             display: flex;
@@ -264,7 +256,6 @@
             background: var(--qt-window);
         }
 
-        /* Log Console */
         .log-container {
             background: var(--qt-base);
             border-bottom: 1px solid var(--qt-border-dark);
@@ -311,7 +302,20 @@
             border-bottom: none;
         }
 
-        /* Scrollable Content */
+        /* Actions Bar - Always visible at top */
+        .actions-bar {
+            background: var(--qt-base);
+            border-bottom: 1px solid var(--qt-border-dark);
+            padding: 8px 10px;
+            flex-shrink: 0;
+        }
+
+        .actions-bar .qt-btn-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 6px;
+        }
+
         .controls-content {
             flex: 1;
             overflow-y: auto;
@@ -324,7 +328,6 @@
             -webkit-overflow-scrolling: touch;
         }
 
-        /* Qt-style Group Box */
         .qt-groupbox {
             background: var(--qt-base);
             border: 1px solid var(--qt-group-border);
@@ -355,7 +358,6 @@
             padding: 8px;
         }
 
-        /* Collapsible Groups */
         .qt-groupbox.collapsed .qt-groupbox-content {
             display: none;
         }
@@ -372,15 +374,10 @@
             transform: rotate(-90deg);
         }
 
-        /* Qt-style Buttons */
         .qt-btn-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 6px;
-        }
-
-        .qt-btn-grid-4 {
-            grid-template-columns: repeat(4, 1fr);
         }
 
         .qt-btn {
@@ -415,10 +412,9 @@
             font-size: 14px;
         }
 
-        /* Button variants */
         .qt-btn-acid { border-left: 3px solid #e91e63; }
-        .qt-btn-group { border-left: 3px solid #2196f3; }
-        .qt-btn-conf { border-left: 3px solid #ff9800; }
+        .qt-btn-base { border-left: 3px solid #9c27b0; }
+        .qt-btn-reagent { border-left: 3px solid #2196f3; }
 
         .qt-btn-action {
             background: linear-gradient(180deg, #4a4a4a 0%, #3a3a3a 100%);
@@ -431,7 +427,6 @@
             border-left: 3px solid var(--qt-error);
         }
 
-        /* Deduction Panel */
         .deduction-panel {
             background: var(--qt-base);
             border: 2px solid var(--qt-highlight);
@@ -463,7 +458,6 @@
             margin-bottom: 10px;
         }
 
-        /* Qt-style Select */
         .qt-select {
             flex: 1;
             background: var(--qt-alternate);
@@ -491,7 +485,6 @@
             color: var(--qt-text);
         }
 
-        /* Submit Button */
         .qt-btn-submit {
             width: 100%;
             background: linear-gradient(180deg, var(--qt-success) 0%, #3d8b40 100%);
@@ -510,7 +503,6 @@
             background: #3d8b40;
         }
 
-        /* Win Screen */
         #win-screen {
             position: fixed;
             top: 0;
@@ -547,7 +539,77 @@
             gap: 8px;
         }
 
-        /* === TABLET & LANDSCAPE === */
+        /* Tab Navigation for Mobile */
+        .tab-nav {
+            display: block;
+            background: var(--qt-base);
+            border-bottom: 1px solid var(--qt-border-dark);
+            flex-shrink: 0;
+        }
+
+        .tab-nav-inner {
+            display: flex;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .tab-btn {
+            flex: 1;
+            min-width: 70px;
+            padding: 10px 8px;
+            background: transparent;
+            border: none;
+            border-bottom: 2px solid transparent;
+            color: var(--qt-text-dim);
+            font-size: 10px;
+            font-family: inherit;
+            font-weight: 500;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+        }
+
+        .tab-btn.active {
+            color: var(--qt-highlight);
+            border-bottom-color: var(--qt-highlight);
+            background: rgba(0, 120, 212, 0.1);
+        }
+
+        .tab-btn span {
+            font-size: 16px;
+        }
+
+        .qt-groupbox {
+            display: none;
+        }
+
+        .qt-groupbox.active {
+            display: block;
+        }
+
+        .deduction-panel {
+            display: block;
+        }
+
+        .reagent-section-label {
+            font-size: 9px;
+            text-transform: uppercase;
+            color: var(--qt-text-dim);
+            margin-bottom: 6px;
+            margin-top: 8px;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid var(--qt-border-dark);
+            padding-bottom: 4px;
+        }
+
+        .reagent-section-label:first-child {
+            margin-top: 0;
+        }
+
         @media (min-width: 600px) {
             .main-container {
                 flex-direction: row;
@@ -583,9 +645,20 @@
                 max-width: 250px;
                 max-height: 320px;
             }
+
+            .tab-nav {
+                display: none;
+            }
+
+            .qt-groupbox {
+                display: block;
+            }
+
+            .qt-groupbox.collapsed .qt-groupbox-content {
+                display: none;
+            }
         }
 
-        /* === LARGE SCREENS === */
         @media (min-width: 900px) {
             body {
                 font-size: 14px;
@@ -632,7 +705,6 @@
             }
         }
 
-        /* === SMALL PHONES === */
         @media (max-width: 360px) {
             .app-title span:not(.app-title-icon) {
                 display: none;
@@ -641,6 +713,10 @@
             .qt-btn-grid {
                 grid-template-columns: repeat(3, 1fr);
                 gap: 4px;
+            }
+
+            .actions-bar .qt-btn-grid {
+                grid-template-columns: repeat(5, 1fr);
             }
 
             .qt-btn {
@@ -664,7 +740,6 @@
             }
         }
 
-        /* === LANDSCAPE PHONE === */
         @media (max-height: 500px) and (orientation: landscape) {
             .main-container {
                 flex-direction: row;
@@ -704,71 +779,16 @@
                 padding: 8px;
                 gap: 8px;
             }
-        }
 
-        /* Tab Navigation for Mobile */
-        .tab-nav {
-            display: none;
-            background: var(--qt-base);
-            border-bottom: 1px solid var(--qt-border-dark);
-            flex-shrink: 0;
-        }
-
-        .tab-nav-inner {
-            display: flex;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-        }
-
-        .tab-btn {
-            flex: 1;
-            min-width: 80px;
-            padding: 10px 8px;
-            background: transparent;
-            border: none;
-            border-bottom: 2px solid transparent;
-            color: var(--qt-text-dim);
-            font-size: 10px;
-            font-family: inherit;
-            font-weight: 500;
-            text-transform: uppercase;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 3px;
-        }
-
-        .tab-btn.active {
-            color: var(--qt-highlight);
-            border-bottom-color: var(--qt-highlight);
-            background: rgba(0, 120, 212, 0.1);
-        }
-
-        .tab-btn span {
-            font-size: 16px;
-        }
-
-        @media (max-width: 599px) {
             .tab-nav {
-                display: block;
-            }
-
-            .qt-groupbox {
                 display: none;
             }
 
-            .qt-groupbox.active {
-                display: block;
-            }
-
-            .deduction-panel {
+            .qt-groupbox {
                 display: block;
             }
         }
 
-        /* Toast Notification */
         .toast {
             position: fixed;
             bottom: 80px;
@@ -800,7 +820,6 @@
             background: rgba(244, 67, 54, 0.95);
         }
 
-        /* Fullscreen styles */
         :fullscreen {
             background-color: var(--qt-window);
         }
@@ -811,7 +830,6 @@
     </style>
 </head>
 <body>
-    <!-- SVG Filters -->
     <svg style="position: absolute; width: 0; height: 0;">
         <defs>
             <filter id="curdy">
@@ -837,20 +855,17 @@
         </defs>
     </svg>
 
-    <!-- Toast Notification -->
     <div class="toast" id="toast"></div>
 
-    <!-- Win Screen -->
     <div id="win-screen">
         <h1>🎉 Complete!</h1>
-        <p>All ions have been identified successfully.</p>
+        <p>All salts have been identified successfully.</p>
         <button class="qt-btn" onclick="game.initGame()">
             <span class="qt-btn-icon">🔬</span>
             New Analysis
         </button>
     </div>
 
-    <!-- Header -->
     <header class="app-header">
         <div class="app-title">
             <span class="app-title-icon">🧪</span>
@@ -869,9 +884,7 @@
         </div>
     </header>
 
-    <!-- Main Container -->
     <div class="main-container">
-        <!-- Lab View -->
         <div class="lab-view">
             <div class="checklist-container">
                 <div class="checklist-label">Progress</div>
@@ -880,7 +893,6 @@
 
             <div class="visual-container">
                 <div class="svg-wrapper">
-                    <!-- Test Tube View -->
                     <svg id="view-tube" viewBox="0 0 100 220">
                         <defs>
                             <radialGradient id="tube-glow" cx="50%" cy="70%" r="50%">
@@ -919,11 +931,10 @@
                         </g>
                         
                         <g id="smell-indicator" opacity="0">
-                            <text x="50" y="20" fill="#ffcc00" font-size="8" text-anchor="middle">👃 Smell</text>
+                            <text x="50" y="20" fill="#ffcc00" font-size="8" text-anchor="middle" id="smell-text">👃 Smell detected</text>
                         </g>
                     </svg>
 
-                    <!-- Ash Test View -->
                     <svg id="view-ash" viewBox="0 0 100 220" style="display: none;">
                         <rect id="ash-paper" x="25" y="70" width="50" height="60" fill="#404040" stroke="#555" rx="2"/>
                         <text x="50" y="160" fill="#808080" font-size="9" text-anchor="middle">Ash Test</text>
@@ -933,9 +944,7 @@
             </div>
         </div>
 
-        <!-- Controls Panel -->
         <div class="controls-panel">
-            <!-- Log Console -->
             <div class="log-container">
                 <div class="log-header">Observations</div>
                 <div class="log-box" id="log">
@@ -943,79 +952,70 @@
                 </div>
             </div>
 
-            <!-- Tab Navigation (Mobile) -->
+            <!-- Actions Bar - Always at top -->
+            <div class="actions-bar">
+                <div class="qt-btn-grid">
+                    <button class="qt-btn qt-btn-action" onclick="game.performAction('heat')">
+                        <span class="qt-btn-icon">🔥</span>Heat
+                    </button>
+                    <button class="qt-btn qt-btn-action" onclick="game.performAction('ash_test')">
+                        <span class="qt-btn-icon">📄</span>Ash
+                    </button>
+                    <button class="qt-btn qt-btn-action" onclick="game.performAction('paper_ball')">
+                        <span class="qt-btn-icon">🧻</span>Paper
+                    </button>
+                    <button class="qt-btn qt-btn-action" onclick="game.performAction('smell_test')">
+                        <span class="qt-btn-icon">👃</span>Smell
+                    </button>
+                    <button class="qt-btn qt-btn-danger" onclick="game.resetTube()">
+                        <span class="qt-btn-icon">💧</span>Wash
+                    </button>
+                </div>
+            </div>
+
+            <!-- Tab Navigation for Mobile -->
             <nav class="tab-nav">
                 <div class="tab-nav-inner">
-                    <button class="tab-btn active" data-tab="actions">
-                        <span>⚡</span>Actions
+                    <button class="tab-btn active" data-tab="acids">
+                        <span>🔴</span>Acids
                     </button>
-                    <button class="tab-btn" data-tab="acids">
-                        <span>🧪</span>Acids
+                    <button class="tab-btn" data-tab="bases">
+                        <span>🟣</span>Bases
                     </button>
-                    <button class="tab-btn" data-tab="groups">
-                        <span>🔬</span>Groups
-                    </button>
-                    <button class="tab-btn" data-tab="conf">
-                        <span>✓</span>Confirm
+                    <button class="tab-btn" data-tab="reagents">
+                        <span>🔵</span>Reagents
                     </button>
                 </div>
             </nav>
 
-            <!-- Scrollable Controls -->
             <div class="controls-content">
-                <!-- Actions -->
-                <div class="qt-groupbox active" id="tab-actions">
+                <!-- Acids Tab -->
+                <div class="qt-groupbox active" id="tab-acids">
                     <div class="qt-groupbox-title" onclick="toggleGroup(this.parentElement)">
-                        <span>⚡</span> Actions
-                    </div>
-                    <div class="qt-groupbox-content">
-                        <div class="qt-btn-grid">
-                            <button class="qt-btn qt-btn-action" onclick="game.performAction('heat')">
-                                <span class="qt-btn-icon">🔥</span>Heat
-                            </button>
-                            <button class="qt-btn qt-btn-action" onclick="game.performAction('ash_test')">
-                                <span class="qt-btn-icon">📄</span>Ash
-                            </button>
-                            <button class="qt-btn qt-btn-action" onclick="game.performAction('paper_ball')">
-                                <span class="qt-btn-icon">🧻</span>Paper
-                            </button>
-                            <button class="qt-btn qt-btn-action" onclick="game.performAction('smell_test')">
-                                <span class="qt-btn-icon">👃</span>Smell
-                            </button>
-                            <button class="qt-btn qt-btn-danger" onclick="game.resetTube()">
-                                <span class="qt-btn-icon">💧</span>Wash
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Acids -->
-                <div class="qt-groupbox" id="tab-acids">
-                    <div class="qt-groupbox-title" onclick="toggleGroup(this.parentElement)">
-                        <span>🧪</span> Acids & Bases
+                        <span>🔴</span> Acids
                     </div>
                     <div class="qt-groupbox-content">
                         <div class="qt-btn-grid" id="grid-acids"></div>
                     </div>
                 </div>
 
-                <!-- Groups -->
-                <div class="qt-groupbox" id="tab-groups">
+                <!-- Bases Tab -->
+                <div class="qt-groupbox" id="tab-bases">
                     <div class="qt-groupbox-title" onclick="toggleGroup(this.parentElement)">
-                        <span>🔬</span> Group Separation
+                        <span>🟣</span> Bases
                     </div>
                     <div class="qt-groupbox-content">
-                        <div class="qt-btn-grid" id="grid-groups"></div>
+                        <div class="qt-btn-grid" id="grid-bases"></div>
                     </div>
                 </div>
 
-                <!-- Confirmatory -->
-                <div class="qt-groupbox" id="tab-conf">
+                <!-- Reagents Tab -->
+                <div class="qt-groupbox" id="tab-reagents">
                     <div class="qt-groupbox-title" onclick="toggleGroup(this.parentElement)">
-                        <span>✓</span> Confirmatory
+                        <span>🔵</span> Reagents & Indicators
                     </div>
                     <div class="qt-groupbox-content">
-                        <div class="qt-btn-grid" id="grid-conf"></div>
+                        <div class="qt-btn-grid" id="grid-reagents"></div>
                     </div>
                 </div>
 
@@ -1028,18 +1028,18 @@
                         <div class="guess-row">
                             <select class="qt-select" id="sel-cation">
                                 <option value="" disabled selected>Cation...</option>
-                                <option value="NH4">NH₄⁺ (Ammonium)</option>
-                                <option value="Pb">Pb²⁺ (Lead)</option>
-                                <option value="Al">Al³⁺ (Aluminium)</option>
-                                <option value="Zn">Zn²⁺ (Zinc)</option>
+                                <option value="NH4">NH₄⁺</option>
+                                <option value="Pb">Pb²⁺</option>
+                                <option value="Al">Al³⁺</option>
+                                <option value="Zn">Zn²⁺</option>
                             </select>
                             <select class="qt-select" id="sel-anion">
                                 <option value="" disabled selected>Anion...</option>
-                                <option value="CO3">CO₃²⁻ (Carbonate)</option>
-                                <option value="CH3COO">CH₃COO⁻ (Acetate)</option>
-                                <option value="Cl">Cl⁻ (Chloride)</option>
-                                <option value="NO3">NO₃⁻ (Nitrate)</option>
-                                <option value="SO4">SO₄²⁻ (Sulphate)</option>
+                                <option value="CO3">CO₃²⁻</option>
+                                <option value="CH3COO">CH₃COO⁻</option>
+                                <option value="Cl">Cl⁻</option>
+                                <option value="NO3">NO₃⁻</option>
+                                <option value="SO4">SO₄²⁻</option>
                             </select>
                         </div>
                         <button class="qt-btn qt-btn-submit" onclick="game.submitGuess()">
@@ -1052,61 +1052,56 @@
     </div>
 
     <script>
-        // Fullscreen functionality
         function toggleFullscreen() {
             if (!document.fullscreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement) {
-                // Enter fullscreen
                 const elem = document.documentElement;
                 if (elem.requestFullscreen) {
                     elem.requestFullscreen();
-                } else if (elem.webkitRequestFullscreen) { // Safari
+                } else if (elem.webkitRequestFullscreen) {
                     elem.webkitRequestFullscreen();
-                } else if (elem.msRequestFullscreen) { // IE11
+                } else if (elem.msRequestFullscreen) {
                     elem.msRequestFullscreen();
                 }
             } else {
-                // Exit fullscreen
                 if (document.exitFullscreen) {
                     document.exitFullscreen();
-                } else if (document.webkitExitFullscreen) { // Safari
+                } else if (document.webkitExitFullscreen) {
                     document.webkitExitFullscreen();
-                } else if (document.msExitFullscreen) { // IE11
+                } else if (document.msExitFullscreen) {
                     document.msExitFullscreen();
                 }
             }
         }
 
-        // Update fullscreen button icon
         function updateFullscreenButton() {
             const isFullscreen = document.fullscreenElement || document.webkitFullscreenElement || document.msFullscreenElement;
             document.getElementById('fs-expand').style.display = isFullscreen ? 'none' : 'block';
             document.getElementById('fs-compress').style.display = isFullscreen ? 'block' : 'none';
         }
 
-        // Listen for fullscreen changes
         document.addEventListener('fullscreenchange', updateFullscreenButton);
         document.addEventListener('webkitfullscreenchange', updateFullscreenButton);
         document.addEventListener('msfullscreenchange', updateFullscreenButton);
 
-        // Reagent Data (Reduced set)
-        const REAGENTS = {
+        // Reagent Data organized by type
+        const REAGENT_DATA = {
             acids: [
                 { id: 'dil_hcl', label: 'Dil. HCl' },
+                { id: 'conc_hcl', label: 'Conc. HCl' },
                 { id: 'dil_h2so4', label: 'Dil. H₂SO₄' },
                 { id: 'conc_h2so4', label: 'Conc. H₂SO₄' },
-                { id: 'dil_acetic', label: 'CH₃COOH' },
                 { id: 'dil_hno3', label: 'Dil. HNO₃' },
-                { id: 'naoh', label: 'NaOH' },
-                { id: 'conc_hcl', label: 'Conc. HCl' }
+                { id: 'dil_acetic', label: 'CH₃COOH' }
             ],
-            groups: [
-                { id: 'na2co3', label: 'Na₂CO₃' },
-                { id: 'h2s', label: 'H₂S Gas' },
-                { id: 'nh4cl', label: 'NH₄Cl' },
+            bases: [
+                { id: 'naoh', label: 'NaOH' },
                 { id: 'nh4oh', label: 'NH₄OH' },
                 { id: 'lime_water', label: 'Lime Water' }
             ],
-            confirmatory: [
+            reagents: [
+                { id: 'na2co3', label: 'Na₂CO₃' },
+                { id: 'h2s', label: 'H₂S Gas' },
+                { id: 'nh4cl', label: 'NH₄Cl' },
                 { id: 'bacl2', label: 'BaCl₂' },
                 { id: 'agno3', label: 'AgNO₃' },
                 { id: 'feso4', label: 'FeSO₄' },
@@ -1124,7 +1119,16 @@
         const CATIONS = ['NH4', 'Pb', 'Al', 'Zn'];
         const TOTAL_SALTS = 5;
 
-        // Toggle group collapse
+        // Shuffle array function
+        function shuffleArray(array) {
+            const arr = [...array];
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+
         function toggleGroup(el) {
             if (window.innerWidth >= 600) {
                 el.classList.toggle('collapsed');
@@ -1143,7 +1147,6 @@
             });
         });
 
-        // Toast notification
         function showToast(msg, type = '') {
             const toast = document.getElementById('toast');
             toast.textContent = msg;
@@ -1151,7 +1154,6 @@
             setTimeout(() => toast.classList.remove('show'), 2500);
         }
 
-        // Main Game Class
         class SaltAnalysisGame {
             constructor() {
                 this.deck = [];
@@ -1175,6 +1177,7 @@
                 this.elPaperBall = document.getElementById('paper-ball');
                 this.elGlassRod = document.getElementById('glass-rod');
                 this.elSmellIndicator = document.getElementById('smell-indicator');
+                this.elSmellText = document.getElementById('smell-text');
             }
 
             initGame() {
@@ -1188,7 +1191,6 @@
             }
 
             generateDeck() {
-                // Create 5 salts covering all anions and cycling through cations
                 const cations = [...CATIONS].sort(() => 0.5 - Math.random());
                 const anions = [...ANIONS].sort(() => 0.5 - Math.random());
                 this.deck = [];
@@ -1198,20 +1200,41 @@
             }
 
             renderReagents() {
-                const render = (id, list, cls) => {
-                    const el = document.getElementById(id);
-                    el.innerHTML = '';
-                    list.forEach(r => {
-                        const btn = document.createElement('button');
-                        btn.className = `qt-btn ${cls}`;
-                        btn.innerHTML = r.label;
-                        btn.onclick = () => this.addReagent(r.id);
-                        el.appendChild(btn);
-                    });
-                };
-                render('grid-acids', REAGENTS.acids, 'qt-btn-acid');
-                render('grid-groups', REAGENTS.groups, 'qt-btn-group');
-                render('grid-conf', REAGENTS.confirmatory, 'qt-btn-conf');
+                // Shuffle and render acids
+                const shuffledAcids = shuffleArray(REAGENT_DATA.acids);
+                const acidGrid = document.getElementById('grid-acids');
+                acidGrid.innerHTML = '';
+                shuffledAcids.forEach(r => {
+                    const btn = document.createElement('button');
+                    btn.className = 'qt-btn qt-btn-acid';
+                    btn.innerHTML = r.label;
+                    btn.onclick = () => this.addReagent(r.id);
+                    acidGrid.appendChild(btn);
+                });
+
+                // Shuffle and render bases
+                const shuffledBases = shuffleArray(REAGENT_DATA.bases);
+                const baseGrid = document.getElementById('grid-bases');
+                baseGrid.innerHTML = '';
+                shuffledBases.forEach(r => {
+                    const btn = document.createElement('button');
+                    btn.className = 'qt-btn qt-btn-base';
+                    btn.innerHTML = r.label;
+                    btn.onclick = () => this.addReagent(r.id);
+                    baseGrid.appendChild(btn);
+                });
+
+                // Shuffle and render reagents
+                const shuffledReagents = shuffleArray(REAGENT_DATA.reagents);
+                const reagentGrid = document.getElementById('grid-reagents');
+                reagentGrid.innerHTML = '';
+                shuffledReagents.forEach(r => {
+                    const btn = document.createElement('button');
+                    btn.className = 'qt-btn qt-btn-reagent';
+                    btn.innerHTML = r.label;
+                    btn.onclick = () => this.addReagent(r.id);
+                    reagentGrid.appendChild(btn);
+                });
             }
 
             renderChecklist() {
@@ -1234,6 +1257,7 @@
                 this.lap++;
                 document.getElementById('lap-display').textContent = `Salt ${this.lap}/${TOTAL_SALTS}`;
                 this.resetTube();
+                this.renderReagents(); // Re-shuffle reagents for new salt
                 this.log(`<b style="color:#0078d4">Salt #${this.lap} loaded</b>`);
             }
 
@@ -1270,7 +1294,8 @@
             addReagent(id) {
                 this.showView('tube');
                 this.tube.reagents.push(id);
-                const reagent = [...Object.values(REAGENTS).flat()].find(r => r.id === id);
+                const allReagents = [...Object.values(REAGENT_DATA).flat()];
+                const reagent = allReagents.find(r => r.id === id);
                 this.log(`Added ${reagent ? reagent.label : id}`);
                 this.animateMix();
                 setTimeout(() => this.evaluate(), 300);
@@ -1302,12 +1327,49 @@
                     case 'smell_test':
                         this.tube.smellChecked = true;
                         this.log('👃 Checking smell...');
-                        this.evaluate();
+                        this.checkSmell();
                         break;
                     case 'ash_test':
                         this.showAshTest();
                         break;
                 }
+            }
+
+            checkSmell() {
+                const r = this.tube.reagents;
+                const a = this.currentSalt.anion;
+                const c = this.currentSalt.cation;
+                const has = (x) => r.includes(x);
+                
+                let smellDetected = false;
+                let smellType = '';
+                
+                // Acetate + dilute H2SO4 = vinegar smell
+                if (a === 'CH3COO' && has('dil_h2so4')) {
+                    smellDetected = true;
+                    smellType = 'Vinegar smell!';
+                    this.log('👃 <span style="color:#ffeb3b">Vinegar smell!</span>');
+                }
+                
+                // NH4+ + NaOH + heat = pungent ammonia smell
+                if (c === 'NH4' && has('naoh') && this.tube.heated) {
+                    smellDetected = true;
+                    smellType = 'Pungent smell!';
+                    this.log('👃 <span style="color:#ffeb3b">Pungent smell!</span>');
+                }
+                
+                // Update visual indicator
+                this.elSmellIndicator.setAttribute('opacity', '1');
+                if (smellDetected) {
+                    this.elSmellText.textContent = '👃 ' + smellType;
+                    this.elSmellText.setAttribute('fill', '#ffcc00');
+                } else {
+                    this.elSmellText.textContent = '👃 No smell';
+                    this.elSmellText.setAttribute('fill', '#808080');
+                    this.log('👃 No characteristic smell detected.');
+                }
+                
+                this.evaluate();
             }
 
             animateHeat() {
@@ -1348,18 +1410,14 @@
                 }
                 if (a === 'CO3' && has('bacl2')) {
                     this.visPpt('#fff', '');
-                    this.log('⬜ White precipitate (BaCO₃)');
+                    this.log('⬜ White precipitate');
                     if (has('dil_hcl')) {
                         this.visBubbles();
                         this.log('💨 Dissolves with effervescence!');
                     }
                 }
 
-                // Acetate
-                if (a === 'CH3COO' && has('dil_h2so4') && this.tube.smellChecked) {
-                    this.elSmellIndicator.setAttribute('opacity', '1');
-                    this.log('👃 <span style="color:#ffeb3b">Vinegar smell!</span>');
-                }
+                // Acetate - smell handled in checkSmell()
                 if (a === 'CH3COO' && has('fecl3')) {
                     this.elLiquid.setAttribute('fill', '#8B4513');
                     this.elLiquid.setAttribute('opacity', '0.8');
@@ -1378,17 +1436,17 @@
                 }
                 if (a === 'Cl' && hasAll('dil_hno3', 'agno3')) {
                     this.visPpt('#f5f5f5', 'curdy');
-                    this.log('⬜ White curdy precipitate (AgCl)');
+                    this.log('⬜ White curdy precipitate');
                     if (has('nh4oh')) {
                         this.elPpt.setAttribute('opacity', '0.2');
-                        this.log('💧 Dissolves in NH₄OH!');
+                        this.log('💧 Dissolves in excess!');
                     }
                 }
 
                 // Nitrate
                 if (a === 'NO3' && has('conc_h2so4') && this.tube.paper && this.tube.heated) {
                     this.visFume('#8B4513', 0.8);
-                    this.log('🟤 <span style="color:#cd5c5c">Brown vapors (NO₂)!</span>');
+                    this.log('🟤 <span style="color:#cd5c5c">Brown vapors!</span>');
                 }
                 if (a === 'NO3' && hasAll('feso4', 'conc_h2so4')) {
                     this.elRing.setAttribute('opacity', '1');
@@ -1398,12 +1456,12 @@
                 // Sulphate
                 if (a === 'SO4' && has('bacl2')) {
                     this.visPpt('#fff', '');
-                    this.log('⬜ White precipitate (BaSO₄)');
-                    if (has('dil_hcl')) this.log('⚠️ Insoluble in HCl');
+                    this.log('⬜ White precipitate');
+                    if (has('dil_hcl')) this.log('⚠️ Insoluble in acid');
                 }
                 if (a === 'SO4' && hasAll('dil_acetic', 'lead_acetate')) {
                     this.visPpt('#fff', '');
-                    this.log('⬜ White precipitate (PbSO₄)');
+                    this.log('⬜ White precipitate');
                     if (has('amm_acetate')) {
                         this.elPpt.setAttribute('opacity', '0.2');
                         this.log('💧 Dissolves in ammonium acetate!');
@@ -1422,14 +1480,14 @@
                     }
                 }
 
-                // NH4+
+                // NH4+ - pungent gas visual (smell handled in checkSmell)
                 if (c === 'NH4' && has('naoh') && this.tube.heated) {
                     this.visFume('#e0e0e0', 0.5);
-                    this.log('💨 Pungent gas (NH₃)!');
+                    this.log('💨 Gas evolved!');
                     if (has('conc_hcl')) {
                         this.elGlassRod.setAttribute('opacity', '1');
                         this.visFume('#fff', 0.9);
-                        this.log('⚪ White fumes with HCl!');
+                        this.log('⚪ White fumes with rod!');
                     }
                 }
                 if (c === 'NH4' && has('nessler')) {
@@ -1440,7 +1498,7 @@
                 // Pb2+
                 if (c === 'Pb' && has('dil_hcl') && !has('h2s')) {
                     this.visPpt('#fff', '');
-                    this.log('⬜ White precipitate (PbCl₂)');
+                    this.log('⬜ White precipitate');
                 }
                 if (c === 'Pb' && has('ki')) {
                     this.visPpt('#FFD700', 'crystalline');
@@ -1456,7 +1514,7 @@
                 }
                 if (c === 'Pb' && hasAll('dil_acetic', 'k2cro4')) {
                     this.visPpt('#FFFF00', '');
-                    this.log('💛 Yellow precipitate (PbCrO₄)!');
+                    this.log('💛 Yellow precipitate!');
                 }
 
                 // Al3+
@@ -1469,21 +1527,21 @@
                     this.log('🔘 White gelatinous precipitate');
                     if (r.filter(x => x === 'naoh').length >= 2) {
                         this.elPpt.setAttribute('opacity', '0.1');
-                        this.log('💧 Dissolves in excess NaOH!');
+                        this.log('💧 Dissolves in excess!');
                     }
                 }
 
                 // Zn2+
                 if (c === 'Zn' && hasAll('nh4cl', 'nh4oh', 'h2s')) {
                     this.visPpt('#F5F5DC', '');
-                    this.log('⬜ Dirty white precipitate (ZnS)!');
+                    this.log('⬜ Dirty white precipitate!');
                 }
                 if (c === 'Zn' && has('naoh')) {
                     this.visPpt('#fff', '');
                     this.log('⬜ White precipitate');
                     if (r.filter(x => x === 'naoh').length >= 2) {
                         this.elPpt.setAttribute('opacity', '0.1');
-                        this.log('💧 Dissolves in excess NaOH!');
+                        this.log('💧 Dissolves in excess!');
                     }
                 }
             }
@@ -1541,8 +1599,16 @@
                 
                 let color = '#555', name = 'No color';
                 
-                if (c === 'Al') { color = '#87CEEB'; name = 'Blue'; this.log('🔵 Blue ash! (Al)'); }
-                else if (c === 'Zn') { color = '#90EE90'; name = 'Green'; this.log('🟢 Green ash! (Zn)'); }
+                if (c === 'Al') { 
+                    color = '#87CEEB'; 
+                    name = 'Blue'; 
+                    this.log('🔵 Blue ash!'); 
+                }
+                else if (c === 'Zn') { 
+                    color = '#90EE90'; 
+                    name = 'Green'; 
+                    this.log('🟢 Green ash!'); 
+                }
                 else this.log('No characteristic ash color');
                 
                 paper.setAttribute('fill', color);
@@ -1574,17 +1640,14 @@
             }
         }
 
-        // Initialize
         const game = new SaltAnalysisGame();
 
-        // Prevent zoom on double tap
         document.addEventListener('touchend', (e) => {
             const now = Date.now();
             if (now - (window.lastTap || 0) < 300) e.preventDefault();
             window.lastTap = now;
         }, { passive: false });
 
-        // Keyboard shortcut for fullscreen (F11 or F key)
         document.addEventListener('keydown', (e) => {
             if (e.key === 'f' || e.key === 'F') {
                 toggleFullscreen();
